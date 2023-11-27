@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 from django_rest_passwordreset.tokens import get_token_generator
@@ -10,16 +10,16 @@ from django_rest_passwordreset.tokens import get_token_generator
 # bug report #1297
 # See: https://github.com/tomchristie/django-rest-framework/issues/1297
 
-AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+AUTH_USER_MODEL = getattr(settings, "AUTH_USER_MODEL", "auth.User")
 
 # get the token generator class
 TOKEN_GENERATOR_CLASS = get_token_generator()
 
 __all__ = [
-    'ResetPasswordToken',
-    'get_password_reset_token_expiry_time',
-    'get_password_reset_lookup_field',
-    'clear_expired',
+    "ResetPasswordToken",
+    "get_password_reset_token_expiry_time",
+    "get_password_reset_lookup_field",
+    "clear_expired",
 ]
 
 
@@ -30,32 +30,24 @@ class ResetPasswordToken(models.Model):
 
     @staticmethod
     def generate_key():
-        """ generates a pseudo random code using os.urandom and binascii.hexlify """
+        """generates a pseudo random code using os.urandom and binascii.hexlify"""
         return TOKEN_GENERATOR_CLASS.generate_token()
 
-    id = models.AutoField(
-        primary_key=True
-    )
+    id = models.AutoField(primary_key=True)
 
     user = models.ForeignKey(
         AUTH_USER_MODEL,
-        related_name='password_reset_tokens',
+        related_name="password_reset_tokens",
         on_delete=models.CASCADE,
-        verbose_name=_("The User which is associated to this password reset token")
+        verbose_name=_("The User which is associated to this password reset token"),
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_("When was this token generated")
+        auto_now_add=True, verbose_name=_("When was this token generated")
     )
 
     # Key field, though it is not the primary key of the model
-    key = models.CharField(
-        _("Key"),
-        max_length=64,
-        db_index=True,
-        unique=True
-    )
+    key = models.CharField(_("Key"), max_length=64, db_index=True, unique=True)
 
     ip_address = models.GenericIPAddressField(
         _("The IP address of this session"),
@@ -87,9 +79,13 @@ def get_password_reset_token_expiry_time(register_token=False):
     """
     # get token validation time
     if register_token:
-        return getattr(settings, 'DJANGO_REST_MULTITOKENAUTH_REGISTER_TOKEN_EXPIRY_TIME', 720)
+        return getattr(
+            settings, "DJANGO_REST_MULTITOKENAUTH_REGISTER_TOKEN_EXPIRY_TIME", 720
+        )
     else:
-        return getattr(settings, 'DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME', 24)
+        return getattr(
+            settings, "DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME", 24
+        )
 
 
 def get_password_reset_lookup_field():
@@ -98,7 +94,7 @@ def get_password_reset_lookup_field():
     Set Django SETTINGS.DJANGO_REST_LOOKUP_FIELD to overwrite this time
     :return: lookup field
     """
-    return getattr(settings, 'DJANGO_REST_LOOKUP_FIELD', 'email')
+    return getattr(settings, "DJANGO_REST_LOOKUP_FIELD", "email")
 
 
 def clear_expired(expiry_time):
@@ -108,28 +104,31 @@ def clear_expired(expiry_time):
     """
     ResetPasswordToken.objects.filter(created_at__lte=expiry_time).delete()
 
+
 def clear_user_tokens(user):
     """
     Remove all of a user's tokens
     :param user: User whose tokens should be expired
     """
     ResetPasswordToken.objects.filter(user=user).delete()
-    
+
+
 def eligible_for_reset(self, register_token=False):
     if not self.is_active:
         # if the user is not active we dont bother checking
         return False
-    
+
     # if we are checking for the register_token, the user cannot have a usable password.
     if register_token:
         return not self.has_usable_password()
 
-    if getattr(settings, 'DJANGO_REST_MULTITOKENAUTH_REQUIRE_USABLE_PASSWORD', True):
+    if getattr(settings, "DJANGO_REST_MULTITOKENAUTH_REQUIRE_USABLE_PASSWORD", True):
         # if we require a usable password then return the result of has_usable_password()
         return self.has_usable_password()
     else:
         # otherwise return True because we dont care about the result of has_usable_password()
         return True
+
 
 # add eligible_for_reset to the user class
 UserModel = get_user_model()
