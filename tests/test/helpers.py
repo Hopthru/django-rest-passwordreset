@@ -60,7 +60,8 @@ class HelperMixin:
         """ REST API wrapper for resetting a user's password using a token """
         data = {
             'token': token,
-            'password': new_password
+            'password': new_password,
+            'register': False
         }
 
         return self.client.post(
@@ -74,7 +75,8 @@ class HelperMixin:
     def rest_do_validate_token(self, token, HTTP_USER_AGENT='', REMOTE_ADDR='127.0.0.1'):
         """ REST API wrapper for validating a token """
         data = {
-            'token': token
+            'token': token,
+            'register': False
         }
 
         return self.client.post(

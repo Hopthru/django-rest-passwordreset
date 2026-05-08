@@ -123,3 +123,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_RATES': {
+        'django-rest-passwordreset-request-token': '99999/second',
+        'django-rest-passwordreset-request-token-test-scope': '1/day',
+    },
+}
