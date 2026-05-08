@@ -8,7 +8,7 @@ from django.contrib.auth.password_validation import (
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import status, serializers, exceptions
+from rest_framework import status, exceptions
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -29,6 +29,7 @@ from django_rest_passwordreset.signals import (
     pre_password_reset,
     post_password_reset,
 )
+from django_rest_passwordreset.throttling import ResetPasswordRequestTokenThrottle
 
 User = get_user_model()
 
@@ -177,7 +178,7 @@ class ResetPasswordRequestToken(GenericAPIView):
     Sends a signal reset_password_token_created when a reset token was created
     """
 
-    throttle_classes = ()
+    throttle_classes = (ResetPasswordRequestTokenThrottle,)
     permission_classes = ()
     serializer_class = EmailSerializer
 
