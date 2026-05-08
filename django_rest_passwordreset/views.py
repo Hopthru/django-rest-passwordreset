@@ -34,7 +34,7 @@ from django_rest_passwordreset.throttling import ResetPasswordRequestTokenThrott
 User = get_user_model()
 
 __all__ = [
-    "ValidateToken",
+    "ResetPasswordValidateToken",
     "ResetPasswordConfirm",
     "ResetPasswordRequestToken",
     "reset_password_validate_token",

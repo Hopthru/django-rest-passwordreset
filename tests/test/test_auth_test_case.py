@@ -72,7 +72,7 @@ class AuthTestCase(APITestCase, HelperMixin):
         # try to validate an invalid token
         response = self.rest_do_validate_token("not_a_valid_token")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
         # there should be zero tokens
         self.assertEqual(ResetPasswordToken.objects.all().count(), 0)
 
@@ -230,7 +230,7 @@ class AuthTestCase(APITestCase, HelperMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(ResetPasswordToken.objects.all().count(), 1)
         self.assertTrue(mock_reset_password_token_created.called)
-        self.assertEquals(mock_reset_password_token_created.call_count, 1)
+        self.assertEqual(mock_reset_password_token_created.call_count, 1)
         token1 = mock_reset_password_token_created.call_args[1]['reset_password_token']
 
         # create another token for user 2
@@ -238,7 +238,7 @@ class AuthTestCase(APITestCase, HelperMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         tokens = ResetPasswordToken.objects.all()
         self.assertEqual(tokens.count(), 2)
-        self.assertEquals(mock_reset_password_token_created.call_count, 2)
+        self.assertEqual(mock_reset_password_token_created.call_count, 2)
         token2 = mock_reset_password_token_created.call_args[1]['reset_password_token']
 
         # validate that those two tokens are different
@@ -269,7 +269,7 @@ class AuthTestCase(APITestCase, HelperMixin):
 
         # try to reset again with token2 (should not work)
         response = self.rest_do_reset_password_with_token(token2.key, "secret2_fake_new")
-        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # user 2 should still be able to login with "secret2_new" now
         self.assertTrue(
@@ -296,7 +296,7 @@ class AuthTestCase(APITestCase, HelperMixin):
 
         # verify that the reset_password_token_created signal was fired
         self.assertTrue(mock_reset_password_token_created.called)
-        self.assertEquals(mock_reset_password_token_created.call_count, 1)
+        self.assertEqual(mock_reset_password_token_created.call_count, 1)
 
         token1 = mock_reset_password_token_created.call_args[1]['reset_password_token']
         self.assertNotEqual(token1.key, "", msg="Verify that the reset_password_token of the reset_password_Token_created signal is not empty")
@@ -315,10 +315,10 @@ class AuthTestCase(APITestCase, HelperMixin):
 
     @override_settings(DJANGO_REST_PASSWORDRESET_NO_INFORMATION_LEAKAGE=True)
     def test_try_reset_password_email_does_not_exist_no_leakage_enabled(self):
-        """ 
+        """
         Tests requesting a token for an email that does not exist when
         DJANGO_REST_PASSWORDRESET_NO_INFORMATION_LEAKAGE == True
-        """ 
+        """
         response = self.rest_do_request_reset_token(email="foobar@doesnotexist.com")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     def test_user_without_password(self):
